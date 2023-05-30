@@ -11,12 +11,50 @@ const Problem2 = () => {
       .then((response) => response.json())
       .then((data) => {
         const phone = data.results;
+        console.log(phone)
         setNumbers(phone);
-        console.log(numbers);
+
         setUnFilteredNumbers(phone);
       })
       .catch((error) => console.error(error));
   }, []);
+  const handleButtonClick = () => {
+    const filtered = numbers.filter((number) => number.country.id===1);
+    setNumbers(filtered);
+  };
+  const handleAllClick = () => {
+    setNumbers(unFilteredNumbers);
+  };
+
+  const handleCheckboxChange = () => {
+    setShowEvenOnly(!showEvenOnly);
+    filterNumbers(!showEvenOnly);
+  };
+
+  const filterNumbers = (isEven) => {
+    if (isEven === false) {
+      setNumbers(unFilteredNumbers);
+    } else {
+      const filtered = numbers.filter((number) => {
+        return isEven ? number.id % 2 === 0 : parsedNumber % 2 !== 0;
+      });
+      setNumbers(filtered);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    filterNumbersBySearch(query);
+  };
+
+  const filterNumbersBySearch = (query) => {
+    const filtered = numbers.filter((number) => {
+      const phoneNumber = number.phone.toLowerCase();
+      return phoneNumber.includes(query);
+    });
+    setNumbers(filtered);
+  };
 
   return (
     <div className="container">
@@ -25,55 +63,50 @@ const Problem2 = () => {
 
         <div className="d-flex justify-content-center gap-3">
           <button
+            onClick={handleAllClick}
             type="button"
             className="btn btn-lg btn-outline-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
           >
             All Contacts
           </button>
-          <div
-            className="modal fade"
-            id="exampleModal"
-            tabIndex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h1 className="modal-title fs-5" id="exampleModalLabel">
-                    Modal title
-                  </h1>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  ></button>
-                </div>
-                <div className="modal-body">...</div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                  <button type="button" className="btn btn-primary">
-                    Save changes
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <button className="btn btn-lg btn-outline-warning" type="button">
+          <button
+            onClick={handleButtonClick}
+            className="btn btn-lg btn-outline-warning"
+            type="button"
+          >
             US Contacts
           </button>
+          <label>
+            Only Even:
+            <input
+              type="checkbox"
+              checked={showEvenOnly}
+              onChange={handleCheckboxChange}
+            />
+          </label>
+          <input
+            type="text"
+            placeholder="Search Numbers..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
         </div>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Number</th>
+          </tr>
+        </thead>
+        <tbody>
+          {numbers.map((number) => (
+            <tr>
+              <td>{number.phone}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
