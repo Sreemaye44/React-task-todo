@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
 const Problem2 = () => {
   const [numbers, setNumbers] = useState([]);
@@ -6,12 +8,17 @@ const Problem2 = () => {
   const [showEvenOnly, setShowEvenOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  
+
   useEffect(() => {
     fetch("https://contact.mediusware.com/api/contacts/")
       .then((response) => response.json())
       .then((data) => {
         const phone = data.results;
-        console.log(phone)
+        console.log(phone);
         setNumbers(phone);
 
         setUnFilteredNumbers(phone);
@@ -19,10 +26,12 @@ const Problem2 = () => {
       .catch((error) => console.error(error));
   }, []);
   const handleButtonClick = () => {
-    const filtered = numbers.filter((number) => number.country.id===1);
+    setShow(true);
+    const filtered = numbers.filter((number) => number.country.id === 1);
     setNumbers(filtered);
   };
-  const handleAllClick = () => {
+  const handleShow = () => {
+    setShow(true);
     setNumbers(unFilteredNumbers);
   };
 
@@ -62,14 +71,46 @@ const Problem2 = () => {
         <h4 className="text-center text-uppercase mb-5">Problem-2</h4>
 
         <div className="d-flex justify-content-center gap-3">
-          <button
-            onClick={handleAllClick}
-            type="button"
-            className="btn btn-lg btn-outline-primary"
-          >
-            All Contacts
-          </button>
-
+          <Button onClick={handleShow}>All Contacts</Button>
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <input
+                type="text"
+                placeholder="Search Numbers..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </Modal.Header>
+            <Modal.Body>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Number</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {numbers.map((number) => (
+                    <tr>
+                      <td>{number.phone}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+              <label>
+                Only Even:
+                <input
+                  type="checkbox"
+                  checked={showEvenOnly}
+                  onChange={handleCheckboxChange}
+                />
+              </label>
+            </Modal.Footer>
+          </Modal>
           <button
             onClick={handleButtonClick}
             className="btn btn-lg btn-outline-warning"
@@ -77,36 +118,8 @@ const Problem2 = () => {
           >
             US Contacts
           </button>
-          <label>
-            Only Even:
-            <input
-              type="checkbox"
-              checked={showEvenOnly}
-              onChange={handleCheckboxChange}
-            />
-          </label>
-          <input
-            type="text"
-            placeholder="Search Numbers..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
         </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Number</th>
-          </tr>
-        </thead>
-        <tbody>
-          {numbers.map((number) => (
-            <tr>
-              <td>{number.phone}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 };

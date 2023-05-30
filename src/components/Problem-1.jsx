@@ -147,6 +147,7 @@ const Problem1 = () => {
           </table>
         </div>
       </div>
+      
     </div>
   );
 };
